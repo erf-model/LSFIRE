@@ -1,10 +1,12 @@
 # ------------------  ERF + LSFIRE: fire heat and vapor fed back to ERF  -------------------
-# erf.fire.coupling_type = lagged adds the fire fluxes to the bottom ERF cell
-# (erf.fire.heat_profile = bottom_cell), through the source term of the step after
-# the fire released them (ERF's one-step lag):
-#   d(rho*theta)/dt = Q / (Cp_d dz),  d(rho*qv)/dt = E / dz   (dz = actual bottom-cell thickness),
-# with E = latent / L_v the vapour mass flux LSFIRE computes.
-# No gravity here, so the heat stays in the bottom layer: the domain integrals close exactly.
+# erf.fire.coupling_type = lagged with ERF's default heat placement: the fluxes enter
+# the source term of the step after the fire released them (ERF's one-step lag),
+# spread over the column with the exponential profile (erf.fire.heat_flux_alfg = 45 m),
+#   d(rho*theta)/dt = w_k Q / (Cp_d Pi dz),  d(rho*qv)/dt = w_k E / dz,
+# with Pi the Exner function (erf.fire.heat_tendency_exner, on), w_k the share of the
+# profile in cell k (sum over the column L = 1 - exp(-z_top/alfg)) and E = latent / L_v
+# the vapour mass flux LSFIRE computes. erf.fire.fire_debug prints the energy ERF
+# receives and injects at every RK stage, for the budget check in the README.
 erf.prob_name = "ABL"
 max_step = 1200               # 600 s
 geometry.prob_extent = 6000 3000 400
@@ -34,10 +36,7 @@ erf.fire.enable = 1
 erf.fire.engine = lsfire
 fire.mode = "atmospheric"
 erf.fire.coupling_type = lagged
-# The LSFIRE coupling's heat placement: all of it in the bottom cell, without
-# the Exner factor (the shared coupling's defaults are exponential and on)
-erf.fire.heat_profile = bottom_cell
-erf.fire.heat_tendency_exner = false
+erf.fire.fire_debug = true
 erf.fire.source_mode = add
 erf.moisture_model = "MoistNoCondensation"   # vapor is only transported (clean budget)
 erf.fire.grid_ratio = 10

@@ -51,7 +51,7 @@ All cases: ERF level 0 is 60 x 30 x 4 cells at 100 m; `erf.fire.grid_ratio = 10`
 |---|---|---|
 | `inputs_lsfire_constant_wind` | `fire.mode = constant_wind`: the ERF wrapper does not change the fire model | Equal to LSFIRE `elmfire_amr` with one fire level on the same 10 m grid and the same fire inputs (phi within 1e-9, identical burned cells at 1 h and 6 h). Burned area 318,900 m^2 at 1 h, 11,092,600 m^2 at 6 h. ~5 min. |
 | `inputs_lsfire_atmos_wind` | `fire.mode = atmospheric`: ERF surface wind drives the fire | Uniform 4.89 m/s at the lowest ERF cell centre (50 m above ground) reaches every fire cell; at 1 h burned area 146,700 m^2, head fire downwind. With `fire.atmos_wind_height=50` the result is bitwise identical; with `fire.atmos_wind_height=46.875` it reproduces the value before the k = 0 change (commit 036ad2e9e and earlier: k = 1 wind, fixed 46.875 m), 149,100 m^2. ~70 s. |
-| `inputs_lsfire_heat_feedback` | `erf.fire.coupling_type = lagged`, `erf.fire.heat_profile = bottom_cell`, with `MoistNoCondensation` | Over the run, domain integrals of rho*theta and rho*qv increase by exactly Sum(P dt)/Cp_d and Sum(E dt) (relative difference ~1e-11), with P and E the heat power and vapor rate released by the fire (`fire.verbosity = 2` prints the heat released per fire update; `erf.fire.fire_debug = true` prints the heating ERF injects). ~16 s. |
+| `inputs_lsfire_heat_feedback` | `erf.fire.coupling_type = lagged` with ERF's default heat placement (exponential profile, `heat_flux_alfg` = 45 m, Exner factor on), `MoistNoCondensation` | `check_heat_feedback_budget.py <run dir>` (all fire updates but the last, which ERF injects after the run ends): (1) the energy ERF receives each step equals the heat LSFIRE released over the step before (1e-10, the printed digits); (2) Cp_d times the change of the rho*theta integral equals the energy ERF injected (7e-12); (3) injected / received = L / Pi = 1.0615 (L = 1 - exp(-400/45) = 0.99986 of the profile is inside the domain, Pi = 0.9419 for rho = 1, theta = 300 K), so the enthalpy Cp_d int Pi d(rho*theta) is L times the heat released (1e-6 with Pi of the mid state; 6 % off without Pi); (4) the rho*qv integral grows by L times the water LSFIRE released (2e-14). Needs `erf.fire.fire_debug = true` and `fire.verbosity = 2`. ~27 s. |
 
 The fire advances with its own level-0 step (`fire.cfl` x fire dx / 10 m/s), clipped to the end
 of each ERF step (or of `fire.subcycle_interval` ERF steps); with an ERF step that is a multiple
@@ -75,7 +75,19 @@ ERF wind from its actual height to the 20-ft height with a log law.
 | `erf.fire.plot_file`, `erf.fire.plot_int`, `erf.fire.plot_per` | The fire-grid plotfile (replaces `fire.fire_plot_file`); by default written with the ERF 3D plotfile |
 | `fire.smoke_heat_per_kg` | Heat per kg of fuel burned [J/kg] for ERF's smoke tracer (`erf.fire.smoke_enable`); default 1.86e7 |
 | `fire.fuel_model_source` | `uniform` (`fire.uniform_fuel_id`) or `landfire` (`fire.nc_fuel_file`, variable `FBFM` on the fire L0 grid). LANDFIRE fuel is used with atmospheric forcing |
-| `fire.band_thickness`, `fire.cfl`, `fire.subcycle_interval` | Narrow-band width, fire CFL, fire update every N ERF steps |
+| `fire.band_thickness`, `fire.cfl`, `fire.subcycle_interval` | Narrow-band width, fire CFL, fire update every N ERF steps (N > 1 only with passive coupling) |
+
+## Fluxes handed to ERF
+
+| Field | Units | What it is |
+|---|---|---|
+| `FireFluxes::sensible` | W/m2 | 0.75 of the reaction intensity of burning cells (LSFIRE `fire_heat_flux`) |
+| `FireFluxes::latent` | W/m2 | the vapour mass flux times ERF's `L_v` (0.25 of the reaction intensity) |
+| `fire_heat_flux` (plotfile) | W/m2 | the sensible flux above |
+| `fire_moisture_flux` (plotfile) | kg/m2/s | the vapour mass flux (latent / `L_v`) |
+
+Both fluxes are per unit ground area, positive into the air, and the mean over the ERF step
+(`fire.subcycle_interval = 1`), whatever fire steps the engine takes inside it.
 
 ## Notes and limitations
 
@@ -89,18 +101,17 @@ ERF wind from its actual height to the 20-ft height with a log law.
 - With `erf.fire.coupling_type = lagged` the fluxes reach ERF through the source term of
   every Runge-Kutta stage of the next ERF step (ERF's one-step lag), not after the dycore of
   the same step as the in-tree coupling did. ERF applies the Exner factor by default
-  (`erf.fire.heat_tendency_exner`); `inputs_lsfire_heat_feedback` turns it off to match
-  the previous coupling. The flux returned to ERF is the fire-L0 flux averaged over the
+  (`erf.fire.heat_tendency_exner`), which the in-tree coupling did not. The flux returned to ERF is the fire-L0 flux averaged over the
   last fire update (all fire substeps), so the energy given to ERF equals the energy the
-  fire released. With `fire.subcycle_interval = N > 1` that mean is handed to ERF for each
-  of the N ERF steps after the update, so it lags the release by up to N steps.
+  fire released. `fire.subcycle_interval = N > 1` is allowed only with `erf.fire.coupling_type =
+  passive` (the run aborts otherwise): the mean of an update would be handed to ERF for each
+  of the N steps after it, not the mean over each ERF step that the coupling expects.
 - The latent flux is handed to ERF in W/m2 (the vapor flux times ERF's `L_v`); ERF divides
   by the same `L_v`, so the water reaching ERF is the vapor flux LSFIRE computes.
 - The reference results in the table above were obtained with the in-tree coupling that
   this engine directory replaces. With the engine (1 rank, CPU), `constant_wind` gives the
   same burned cells at 1 h and 6 h (phi within 2e-10) and `atmos_wind` the same 1 h area;
-  in `heat_feedback` the change of the rho*theta integral times Cp_d equals the heat of all
-  fire updates but the last (one-step lag) to 1e-11.
+  `heat_feedback` (ERF's default heat placement) closes the budgets listed in the table.
 - Atmospheric wind is copied from each ERF cell to the fire cells it covers (no sub-cell
   structure). Its height above ground is passed per column; `wind_height` can be added to
   `fire.fire_plot_vars_1` to write it on the fire grid.

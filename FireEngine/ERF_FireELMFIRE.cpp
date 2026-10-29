@@ -307,9 +307,12 @@ FireELMFIRE::verify_prerequisites (const ERF& erf, int lev)
                      " (and leave erf.fire.anchor_level unset); refine the fire grid with"
                      " erf.fire.grid_ratio and fire_amr.* instead");
     }
-    if (m_fire_mode == "atmospheric" && m_coupling.is_synchronous() && m_subcycle_interval > 1) {
-        amrex::Print() << "[FIRE] WARNING: lsfire with fire.subcycle_interval > 1 holds the wind of the"
-                       << " update step for the whole interval\n";
+    // With N > 1 the mean flux of an update is handed to ERF for the N steps after it,
+    // not the mean over each ERF step that FireFluxes asks for: allowed only when no
+    // flux reaches the atmosphere
+    if (m_coupling.injects_flux() && m_subcycle_interval > 1) {
+        amrex::Abort("[FIRE] lsfire: fire.subcycle_interval > 1 needs erf.fire.coupling_type = passive"
+                     " (got " + m_coupling.coupling_type + ")");
     }
 }
 
@@ -521,8 +524,10 @@ FireELMFIRE::advance (const FireForcing& forcing)
     if (m_verbosity > 1) {   // sum() is an MPI reduction: all ranks
         const auto dxf = m_geom_fire.CellSizeArray();
         const amrex::Real released = m_heat_flux_fire.sum(0) * dxf[0] * dxf[1] * fire_dt;
+        const amrex::Real water    = m_moist_flux_fire.sum(0) * dxf[0] * dxf[1] * fire_dt;
         amrex::Print() << "Fire: heat released by fire level 0 over the last " << fire_dt
-                       << " s = " << std::setprecision(12) << released << " J" << std::endl;
+                       << " s = " << std::setprecision(12) << released << " J, water vapour = "
+                       << water << " kg" << std::endl;
     }
 
     if (!m_config.use_constant_wind) {
