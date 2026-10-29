@@ -30,13 +30,6 @@ bash Build/cmake_cpu.sh <build dir>
 The executable is `<build dir>/Exec/erf_exec`. See `Exec/RegTests/LSFIRE/README.md` for the
 inputs and the GNU make build.
 
-## Status
-
-- The fire runs on one fire level coupled to ERF level 0. LSFIRE's static multilevel
-  fire grid is in the source but is not supported through this engine.
-- CPU only so far; GPU builds are not tested.
-- Fire restart (checkpointing) is not implemented; a restart with the fire on aborts.
-
 ## License
 
 BSD 3-Clause, see `LICENSE.md`. The `ERF/` submodule keeps ERF's own license.
