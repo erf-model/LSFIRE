@@ -1,0 +1,21 @@
+# The LSFIRE fire engine directory, for GNU make. ERF reads this file when
+# FIRE_HOME lists this directory (USE_FIRE = TRUE); FIRE_ENGINE_DIR is the
+# directory, already on VPATH and the include path.
+#
+# The LSFIRE core (LSFIRE/include, LSFIRE/src) is compiled with ERF's own
+# AMReX; there is no separate libelmfire_core.a.
+CEXE_sources += ERF_FireELMFIRE.cpp
+CEXE_sources += ERF_FireReadFuel.cpp
+CEXE_sources += ERF_FireReadIgnition.cpp
+CEXE_headers += ERF_FireELMFIRE.H
+
+LSFIRE_SRC := $(FIRE_ENGINE_DIR)/LSFIRE/src
+CEXE_sources += ElmfireEngine.cpp ConfigReader.cpp OutputWriter.cpp ElmfireAmrCore.cpp FireHierarchy.cpp
+CEXE_sources += FuelModels.cpp Rothermel.cpp EllipticalFire.cpp Spotting.cpp
+CEXE_sources += Gradients.cpp LevelSetSolver.cpp
+CEXE_sources += GpuNarrowBand.cpp
+CEXE_sources += ELMFIRE_API.cpp
+
+VPATH_LOCATIONS   += $(LSFIRE_SRC)/Core $(LSFIRE_SRC)/Physics $(LSFIRE_SRC)/Numerics
+VPATH_LOCATIONS   += $(LSFIRE_SRC)/DataStructures $(LSFIRE_SRC)/API
+INCLUDE_LOCATIONS += $(FIRE_ENGINE_DIR)/LSFIRE/include $(LSFIRE_SRC)

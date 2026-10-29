@@ -1,0 +1,3 @@
+[submodule "ERF"]
+	path = ERF
+	url = https://github.com/erf-model/ERF.git
