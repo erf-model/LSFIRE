@@ -36,6 +36,10 @@ USE_NETCDF  = TRUE
 include $(ERF_HOME)/Exec/Make.ERF
 ```
 
+With more than one MPI rank, every ERF level-0 box must have x and y lengths divisible by
+`erf.fire.grid_ratio` (ERF stops otherwise), e.g. for 60 x 30 cells and ratio 10:
+`amr.blocking_factor = 1`, `amr.max_grid_size_x = 20`, `amr.max_grid_size_y = 10`.
+
 Run from a directory containing the inputs file and `fuel_models.csv`:
 
 ```
