@@ -3,7 +3,8 @@
 LSFIRE is a level-set wildland fire spread model (Rothermel spread, ELMFIRE-style
 narrow band) built on AMReX. This repository couples it to the
 [ERF](https://github.com/erf-model/ERF) atmospheric model as a fire engine behind
-ERF's shared fire coupling (erf-model/ERF#4798): `erf.fire.engine = lsfire`.
+ERF's shared fire coupling (erf-model/ERF#4798): `erf.fire.engine = lsfire`. The fire models
+available for ERF are listed at https://github.com/erf-model/ERF-Fire.
 
 ## Layout
 
@@ -18,9 +19,11 @@ ERF's shared fire coupling (erf-model/ERF#4798): `erf.fire.engine = lsfire`.
 ## Build
 
 ```
-git clone --recursive <this repository>     # or: git submodule update --init ERF && \
-                                            #     git -C ERF submodule update --init Submodules/AMReX
-source Build/env_perlmutter_cpu.sh          # Perlmutter only
+git clone https://github.com/erf-model/LSFIRE.git
+cd LSFIRE
+git submodule update --init ERF
+git -C ERF submodule update --init Submodules/AMReX   # the only ERF submodule needed
+source Build/env_perlmutter_cpu.sh                    # Perlmutter only
 bash Build/cmake_cpu.sh <build dir>
 ```
 
@@ -33,6 +36,10 @@ inputs and the GNU make build.
   fire grid is in the source but is not supported through this engine.
 - CPU only so far; GPU builds are not tested.
 - Fire restart (checkpointing) is not implemented; a restart with the fire on aborts.
+
+## License
+
+BSD 3-Clause, see `LICENSE.md`. The `ERF/` submodule keeps ERF's own license.
 
 ## Sources
 
