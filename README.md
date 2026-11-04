@@ -93,7 +93,7 @@ machinery and is configured separately under `erf.fire.*`.
 | `FireEngine/LSFIRE/src/Numerics/` | Gradients and level-set integration |
 | `FireEngine/LSFIRE/src/DataStructures/` | Narrow-band data |
 | `Exec/RegTests/LSFIRE/` | Coupled inputs, fuel table, analysis scripts, and documented reference results |
-| `Build/` | CPU/MPI build script and Perlmutter environment setup |
+| `Build/` | CMake build script and Perlmutter environment setup |
 
 The `ELMFIRE` names in some classes and files are retained implementation names.
 The engine is registered with ERF as `lsfire`.
@@ -112,13 +112,13 @@ recorded by this repository to reproduce its dependency configuration.
 
 ## Build
 
-The supplied script builds a three-dimensional, Release-mode CPU executable
+The supplied script builds a three-dimensional, Release-mode executable
 with MPI, NetCDF, and the LSFIRE engine enabled. It requires a compatible
 C++ compiler, CMake, MPI, and NetCDF with its dependencies. See the
 [ERF documentation](https://erf.readthedocs.io/) for platform-specific dependency
 setup.
 
-### Perlmutter CPU
+### Perlmutter
 
 From the repository root:
 
@@ -130,7 +130,7 @@ bash Build/cmake_cpu.sh build 16
 The second argument is the number of build jobs. The executable is
 `build/Exec/erf_exec`.
 
-### Other CPU systems
+### Other systems
 
 Set up your compiler, MPI, and NetCDF environment, then use the same build
 script without sourcing the Perlmutter module setup:
@@ -180,7 +180,7 @@ The case covers a 6000 × 3000 × 400 m atmospheric domain with 100 m cells and
 simulation advances for one hour and writes atmospheric plotfiles with prefix
 `plt` and fire-grid plotfiles with prefix `fire_plt`.
 
-The documented one-rank CPU reference burned area at one hour is **146,700 m²**.
+The documented one-rank reference burned area at one hour is **146,700 m²**.
 See the test README for the wind-height convention and reference details.
 
 ## Main inputs
@@ -213,7 +213,7 @@ obsolete names, including `fire.fire_ref_ratio`, `fire.bandthickness`, and
 ## Regression cases
 
 The [coupled-test README](Exec/RegTests/LSFIRE/README.md) records the following
-reference checks with one MPI rank on CPU:
+reference checks with one MPI rank:
 
 | Case | Purpose | Documented reference |
 |---|---|---|
