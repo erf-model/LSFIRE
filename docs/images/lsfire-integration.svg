@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 560" width="960" height="560" role="img" aria-labelledby="t d" font-family="Helvetica, Arial, sans-serif">
+  <title id="t">How LSFIRE connects to ERF</title>
+  <desc id="d">ERF holds the atmosphere and the fire coupling. LSFIRE holds a pinned ERF submodule, an engine and adapter, and build and test tools. ERF-Fire holds this documentation.</desc>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#475569"/></marker>
+  </defs>
+  <rect width="960" height="560" rx="14" fill="#ffffff"/>
+
+  <!-- ERF-Fire -->
+  <rect x="24" y="20" width="912" height="66" rx="10" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5"/>
+  <text x="44" y="48" font-size="18" font-weight="700" fill="#0f172a">erf-model/ERF-Fire</text>
+  <text x="44" y="71" font-size="14" fill="#334155">Documentation of the fire coupling, and links to the fire models. No code.</text>
+
+  <!-- ERF -->
+  <rect x="24" y="108" width="400" height="432" rx="10" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+  <text x="44" y="138" font-size="18" font-weight="700" fill="#1e3a8a">erf-model/ERF</text>
+  <text x="44" y="160" font-size="14" fill="#1e3a8a">No fire engine inside</text>
+
+  <rect x="44" y="176" width="360" height="66" rx="8" fill="#dbeafe" stroke="#2563eb"/>
+  <text x="60" y="203" font-size="15" font-weight="700" fill="#1e3a8a">Atmosphere core</text>
+  <text x="60" y="225" font-size="13.5" fill="#1e3a8a">Dynamics, turbulence, surface layer, physics</text>
+
+  <rect x="44" y="256" width="360" height="176" rx="8" fill="#bfdbfe" stroke="#1d4ed8" stroke-width="2"/>
+  <text x="60" y="283" font-size="15" font-weight="700" fill="#1e3a8a">Fire coupling: Source/FireCoupling</text>
+  <text x="60" y="309" font-size="13.5" fill="#1e3a8a">FireCoupler: fire grid, heat and smoke injection</text>
+  <text x="60" y="333" font-size="13.5" fill="#1e3a8a">FireEngine: the interface every engine uses</text>
+  <text x="60" y="357" font-size="13.5" fill="#1e3a8a">Engine registry and erf.fire.* input parser</text>
+  <text x="60" y="381" font-size="13.5" fill="#1e3a8a">Wind and ground height helpers</text>
+  <text x="60" y="405" font-size="13.5" fill="#1e3a8a">ERF_FireEngineTemplate.H: declarations only</text>
+
+  <rect x="44" y="446" width="360" height="74" rx="8" fill="#dbeafe" stroke="#2563eb"/>
+  <text x="60" y="473" font-size="15" font-weight="700" fill="#1e3a8a">Tests</text>
+  <text x="60" y="497" font-size="13.5" fill="#1e3a8a">Tests/FireEngineExample, Tests/Unit/Fire</text>
+
+  <!-- LSFIRE -->
+  <rect x="536" y="108" width="400" height="432" rx="10" fill="#fff7ed" stroke="#ea580c" stroke-width="1.5"/>
+  <text x="556" y="138" font-size="18" font-weight="700" fill="#7c2d12">erf-model/LSFIRE</text>
+  <text x="556" y="160" font-size="14" fill="#7c2d12">Pinned ERF submodule and external fire engine</text>
+
+  <rect x="556" y="176" width="360" height="66" rx="8" fill="#dbeafe" stroke="#2563eb" stroke-dasharray="6 4"/>
+  <text x="572" y="203" font-size="15" font-weight="700" fill="#1e3a8a">ERF submodule: ERF/</text>
+  <text x="572" y="225" font-size="13.5" fill="#1e3a8a">Fixed to an upstream ERF commit</text>
+
+  <rect x="556" y="256" width="360" height="130" rx="8" fill="#fed7aa" stroke="#c2410c" stroke-width="2"/>
+  <text x="572" y="283" font-size="15" font-weight="700" fill="#7c2d12">LSFIRE fire engine: FireEngine/</text>
+  <text x="572" y="309" font-size="13.5" fill="#7c2d12">Rothermel spread and elliptical front velocity</text>
+  <text x="572" y="333" font-size="13.5" fill="#7c2d12">Narrow-band level set, fuel and ignition inputs</text>
+  <text x="572" y="357" font-size="13.5" fill="#7c2d12">ERF adapter: forcing and flux exchange</text>
+
+  <rect x="556" y="400" width="360" height="120" rx="8" fill="#dcfce7" stroke="#15803d" stroke-width="2"/>
+  <text x="572" y="427" font-size="15" font-weight="700" fill="#14532d">Build and test resources</text>
+  <text x="572" y="453" font-size="13.5" fill="#14532d">Exec/RegTests/LSFIRE/: three coupled cases</text>
+  <text x="572" y="477" font-size="13.5" fill="#14532d">Fuel table and heat-feedback budget checker</text>
+
+  <!-- links -->
+  <path d="M424 209 H556" stroke="#475569" stroke-width="2" fill="none" marker-end="url(#a)" stroke-dasharray="6 4"/>
+  <text x="480" y="199" font-size="12.5" text-anchor="middle" fill="#334155">pins commit</text>
+  <path d="M556 320 H404" stroke="#475569" stroke-width="2" fill="none" marker-end="url(#a)"/>
+  <text x="480" y="298" font-size="12.5" text-anchor="middle" fill="#334155">plugs in through</text>
+  <text x="480" y="312" font-size="12.5" text-anchor="middle" fill="#334155">FireEngine</text>
+</svg>

@@ -24,6 +24,8 @@ reference results, and parameter notes, see the
 The model formulation, idealized verification, and Palisades and Cram Fire
 applications are described in our [model description paper](#model-description-paper).
 
+![How LSFIRE connects to ERF](images/lsfire-integration.svg)
+
 ## Model and coupling
 
 The LSFIRE core provides:
